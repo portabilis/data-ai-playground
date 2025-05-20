@@ -1,61 +1,49 @@
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export const SuggestedQueries = ({
   handleSuggestionClick,
 }: {
   handleSuggestionClick: (suggestion: string) => void;
 }) => {
-  const suggestionQueries = [
-    {
-      desktop: "Compare count of unicorns in SF and NY over time",
-      mobile: "SF vs NY",
-    },
-    {
-      desktop: "Compare unicorn valuations in the US vs China over time",
-      mobile: "US vs China",
-    },
-    {
-      desktop: "Countries with highest unicorn density",
-      mobile: "Top countries",
-    },
-    {
-      desktop:
-        "Show the number of unicorns founded each year over the past two decades",
-      mobile: "Yearly count",
-    },
-    {
-      desktop: "Display the cumulative total valuation of unicorns over time",
-      mobile: "Total value",
-    },
-    {
-      desktop:
-        "Compare the yearly funding amounts for fintech vs healthtech unicorns",
-      mobile: "Fintech vs health",
-    },
-    {
-      desktop: "Which cities have with most SaaS unicorns",
-      mobile: "SaaS cities",
-    },
-    {
-      desktop: "Show the countries with highest unicorn density",
-      mobile: "Dense nations",
-    },
-    {
-      desktop:
-        "Show the number of unicorns (grouped by year) over the past decade",
-      mobile: "Decade trend",
-    },
-    {
-      desktop:
-        "Compare the average valuation of AI companies vs. biotech companies",
-      mobile: "AI vs biotech",
-    },
-    {
-      desktop: "Investors with the most unicorns",
-      mobile: "Top investors",
-    },
-  ];
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Buscar sugestões do servidor
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      try {
+        const response = await fetch('/api/suggestions');
+        if (!response.ok) {
+          throw new Error('Falha ao buscar sugestões');
+        }
+        const data = await response.json();
+
+        // Se houver sugestões no banco, usá-las
+        if (data.suggestions && data.suggestions.length > 0) {
+          setSuggestions(data.suggestions);
+        } else {
+          setSuggestions([]);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar sugestões:', error);
+        setSuggestions([]);
+        toast.error('Erro ao carregar sugestões');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSuggestions();
+  }, []);
+
+  // Converter sugestões simples para o formato desktop/mobile
+  const formattedSuggestions = suggestions.map(suggestion => ({
+    desktop: suggestion,
+    mobile: suggestion.length > 20 ? suggestion.substring(0, 18) + '...' : suggestion,
+  }));
 
   return (
     <motion.div
@@ -67,21 +55,27 @@ export const SuggestedQueries = ({
       className="h-full overflow-y-auto"
     >
       <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4">
-        Try these queries:
+        Sugestões
       </h2>
       <div className="flex flex-wrap gap-2">
-        {suggestionQueries.map((suggestion, index) => (
-          <Button
-            key={index}
-            className={index > 5 ? "hidden sm:inline-block" : ""}
-            type="button"
-            variant="outline"
-            onClick={() => handleSuggestionClick(suggestion.desktop)}
-          >
-            <span className="sm:hidden">{suggestion.mobile}</span>
-            <span className="hidden sm:inline">{suggestion.desktop}</span>
-          </Button>
-        ))}
+        {isLoading ? (
+          <p className="text-muted-foreground">Carregando sugestões...</p>
+        ) : formattedSuggestions.length > 0 ? (
+          formattedSuggestions.map((suggestion, index) => (
+            <Button
+              key={index}
+              className={index > 5 ? "hidden sm:inline-block" : ""}
+              type="button"
+              variant="outline"
+              onClick={() => handleSuggestionClick(suggestion.desktop)}
+            >
+              <span className="sm:hidden">{suggestion.mobile}</span>
+              <span className="hidden sm:inline">{suggestion.desktop}</span>
+            </Button>
+          ))
+        ) : (
+          <p className="text-muted-foreground">Nenhuma sugestão disponível</p>
+        )}
       </div>
     </motion.div>
   );

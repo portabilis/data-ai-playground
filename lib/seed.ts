@@ -32,6 +32,17 @@ export async function seed() {
 
   console.log(`Created "unicorns" table`);
 
+  // Criar tabela de sugestões
+  const createSuggestionsTable = await sql`
+    CREATE TABLE IF NOT EXISTS suggestions (
+      id SERIAL PRIMARY KEY,
+      query TEXT NOT NULL UNIQUE,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+
+  console.log(`Created "suggestions" table`);
+
   const results: any[] = [];
   const csvFilePath = path.join(process.cwd(), 'unicorns.csv');
 
@@ -65,6 +76,7 @@ export async function seed() {
 
   return {
     createTable,
+    createSuggestionsTable,
     unicorns: results,
   };
 }

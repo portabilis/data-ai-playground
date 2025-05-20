@@ -27,7 +27,7 @@ export const Search = ({
         <div className="relative flex-grow">
           <Input
             type="text"
-            placeholder="Ask about startup unicorns..."
+            placeholder="Pergunte sobre a sua base..."
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             className="pr-10 text-base"
@@ -42,11 +42,11 @@ export const Search = ({
               onClick={handleClear}
               className="w-full sm:w-auto"
             >
-              Clear
+              Limpar
             </Button>
           ) : (
             <Button type="submit" className="w-full sm:w-auto">
-              Send
+              Enviar
             </Button>
           )}
         </div>
