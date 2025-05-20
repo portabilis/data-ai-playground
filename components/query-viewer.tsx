@@ -114,8 +114,7 @@ export const QueryViewer = ({
                       queryExplanations={queryExplanations}
                     />
                     <p className="font-sans mt-4 text-base">
-                      Generated explanation! Hover over different parts of the SQL
-                      query to see explanations.
+                      Explicação gerada! Passe o mouse sobre diferentes partes da consulta SQL para ver as explicações.
                     </p>
                   </div>
                   <Button
@@ -188,7 +187,7 @@ export const QueryViewer = ({
           onClick={() => setQueryExpanded(true)}
           className="absolute inset-0 h-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"
         >
-          Show full query
+          Expandir
         </Button>
       )}
     </div>

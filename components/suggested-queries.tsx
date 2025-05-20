@@ -3,42 +3,6 @@ import { Button } from "./ui/button";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-// Sugestões padrão como fallback
-const defaultSuggestions = [
-  {
-    desktop: "Média de idade dos alunos por série",
-    mobile: "Idade por série",
-  },
-  {
-    desktop: "Distribuição de gêneros por série",
-    mobile: "Gênero por série",
-  },
-  {
-    desktop: "Quantidade de alunos beneficiados pelo Bolsa Família",
-    mobile: "Bolsa Família",
-  },
-  {
-    desktop: "Número de alunos por escola",
-    mobile: "Alunos por escola",
-  },
-  {
-    desktop: "Percentual de alunos por zona de localização",
-    mobile: "Alunos por zona",
-  },
-  {
-    desktop: "Contagem de alunos por raça",
-    mobile: "Alunos por raça",
-  },
-  {
-    desktop: "Lista de bairros com mais matrículas",
-    mobile: "Top bairros",
-  },
-  {
-    desktop: "Comparar inscrições por gênero entre séries",
-    mobile: "Gênero vs série",
-  },
-];
-
 export const SuggestedQueries = ({
   handleSuggestionClick,
 }: {
@@ -57,17 +21,15 @@ export const SuggestedQueries = ({
         }
         const data = await response.json();
 
-        // Se houver sugestões no banco, usá-las, senão usar as padrão
+        // Se houver sugestões no banco, usá-las
         if (data.suggestions && data.suggestions.length > 0) {
           setSuggestions(data.suggestions);
         } else {
-          // Usar apenas o texto desktop das sugestões padrão
-          setSuggestions(defaultSuggestions.map(s => s.desktop));
+          setSuggestions([]);
         }
       } catch (error) {
         console.error('Erro ao buscar sugestões:', error);
-        // Em caso de erro, usar sugestões padrão
-        setSuggestions(defaultSuggestions.map(s => s.desktop));
+        setSuggestions([]);
         toast.error('Erro ao carregar sugestões');
       } finally {
         setIsLoading(false);
@@ -98,7 +60,7 @@ export const SuggestedQueries = ({
       <div className="flex flex-wrap gap-2">
         {isLoading ? (
           <p className="text-muted-foreground">Carregando sugestões...</p>
-        ) : (
+        ) : formattedSuggestions.length > 0 ? (
           formattedSuggestions.map((suggestion, index) => (
             <Button
               key={index}
@@ -111,6 +73,8 @@ export const SuggestedQueries = ({
               <span className="hidden sm:inline">{suggestion.desktop}</span>
             </Button>
           ))
+        ) : (
+          <p className="text-muted-foreground">Nenhuma sugestão disponível</p>
         )}
       </div>
     </motion.div>
