@@ -46,12 +46,12 @@ export default function Page() {
       }
       setActiveQuery(query);
       setLoadingStep(2);
-      const companies = await runGenerateSQLQuery(query);
-      const columns = companies.length > 0 ? Object.keys(companies[0]) : [];
-      setResults(companies);
+      const students = await runGenerateSQLQuery(query);
+      const columns = students.length > 0 ? Object.keys(students[0]) : [];
+      setResults(students);
       setColumns(columns);
       setLoading(false);
-      const generation = await generateChartConfig(companies, question);
+      const generation = await generateChartConfig(students, question);
       setChartConfig(generation.config);
     } catch (e) {
       toast.error("An error occurred. Please try again.");
@@ -129,14 +129,14 @@ export default function Page() {
                           <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
                           <p className="text-foreground">
                             {loadingStep === 1
-                              ? "Generating SQL query..."
-                              : "Running SQL query..."}
+                              ? "Gerando a query SQL..."
+                              : "Executando a query SQL..."}
                           </p>
                         </div>
                       ) : results.length === 0 ? (
                         <div className="flex-grow flex items-center justify-center">
                           <p className="text-center text-muted-foreground">
-                            No results found.
+                            Nenhum resultado encontrado.
                           </p>
                         </div>
                       ) : (

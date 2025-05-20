@@ -8,52 +8,36 @@ export const SuggestedQueries = ({
 }) => {
   const suggestionQueries = [
     {
-      desktop: "Compare count of unicorns in SF and NY over time",
-      mobile: "SF vs NY",
+      desktop: "Média de idade dos alunos por série",
+      mobile: "Idade por série",
     },
     {
-      desktop: "Compare unicorn valuations in the US vs China over time",
-      mobile: "US vs China",
+      desktop: "Distribuição de gêneros por série",
+      mobile: "Gênero por série",
     },
     {
-      desktop: "Countries with highest unicorn density",
-      mobile: "Top countries",
+      desktop: "Quantidade de alunos beneficiados pelo Bolsa Família",
+      mobile: "Bolsa Família",
     },
     {
-      desktop:
-        "Show the number of unicorns founded each year over the past two decades",
-      mobile: "Yearly count",
+      desktop: "Número de alunos por escola",
+      mobile: "Alunos por escola",
     },
     {
-      desktop: "Display the cumulative total valuation of unicorns over time",
-      mobile: "Total value",
+      desktop: "Percentual de alunos por zona de localização",
+      mobile: "Alunos por zona",
     },
     {
-      desktop:
-        "Compare the yearly funding amounts for fintech vs healthtech unicorns",
-      mobile: "Fintech vs health",
+      desktop: "Contagem de alunos por raça",
+      mobile: "Alunos por raça",
     },
     {
-      desktop: "Which cities have with most SaaS unicorns",
-      mobile: "SaaS cities",
+      desktop: "Lista de bairros com mais matrículas",
+      mobile: "Top bairros",
     },
     {
-      desktop: "Show the countries with highest unicorn density",
-      mobile: "Dense nations",
-    },
-    {
-      desktop:
-        "Show the number of unicorns (grouped by year) over the past decade",
-      mobile: "Decade trend",
-    },
-    {
-      desktop:
-        "Compare the average valuation of AI companies vs. biotech companies",
-      mobile: "AI vs biotech",
-    },
-    {
-      desktop: "Investors with the most unicorns",
-      mobile: "Top investors",
+      desktop: "Comparar inscrições por gênero entre séries",
+      mobile: "Gênero vs série",
     },
   ];
 
@@ -67,7 +51,7 @@ export const SuggestedQueries = ({
       className="h-full overflow-y-auto"
     >
       <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4">
-        Try these queries:
+        Sugestões
       </h2>
       <div className="flex flex-wrap gap-2">
         {suggestionQueries.map((suggestion, index) => (

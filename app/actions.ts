@@ -11,47 +11,46 @@ export const generateQuery = async (input: string) => {
   try {
     const result = await generateObject({
       model: openai("gpt-4o"),
-      system: `You are a SQL (postgres) and data visualization expert. Your job is to help the user write a SQL query to retrieve the data they need. The table schema is as follows:
+      system: `You are a SQL (PostgreSQL) and data visualization expert. Your job is to help the user write a SQL query to retrieve the data they need. The table schema is as follows:
 
-      unicorns (
-      id SERIAL PRIMARY KEY,
-      company VARCHAR(255) NOT NULL UNIQUE,
-      valuation DECIMAL(10, 2) NOT NULL,
-      date_joined DATE,
-      country VARCHAR(255) NOT NULL,
-      city VARCHAR(255) NOT NULL,
-      industry VARCHAR(255) NOT NULL,
-      select_investors TEXT NOT NULL
-    );
+alunos (
+  id SERIAL PRIMARY KEY,
+  aluno_data_nascimento DATE,
+  aluno_genero VARCHAR(255),
+  raca VARCHAR(255),
+  bolsa_familia BOOLEAN,
+  zona_localizacao VARCHAR(255),
+  bairro VARCHAR(255),
+  cidade VARCHAR(255),
+  escola VARCHAR(255),
+  curso VARCHAR(255),
+  serie VARCHAR(255),
+  matricula_id INTEGER NOT NULL UNIQUE
+);
 
-    Only retrieval queries are allowed.
+Only retrieval queries (SELECT) are allowed.
 
-    For things like industry, company names and other string fields, use the ILIKE operator and convert both the search term and the field to lowercase using LOWER() function. For example: LOWER(industry) ILIKE LOWER('%search_term%').
+Use ILIKE with LOWER() for string comparisons, e.g.:
+  LOWER(curso) ILIKE LOWER('%pedagogia%').
 
-    Note: select_investors is a comma-separated list of investors. Trim whitespace to ensure you're grouping properly. Note, some fields may be null or have only one value.
-    When answering questions about a specific field, ensure you are selecting the identifying column (ie. what is Vercel's valuation would select company and valuation').
+To filter by age, compute:
+  EXTRACT(YEAR FROM AGE(CURRENT_DATE, aluno_data_nascimento))
 
-    The industries available are:
-    - healthcare & life sciences
-    - consumer & retail
-    - financial services
-    - enterprise tech
-    - insurance
-    - media & entertainment
-    - industrials
-    - health
+Always return at least two columns with quantitative data suitable for charting: counts, aggregates or rates. If a single field is requested, pair it with a COUNT or appropriate aggregate.
 
-    If the user asks for a category that is not in the list, infer based on the list above.
+Return rates/percentages as decimals (e.g., 0.25 for 25%).
 
-    Note: valuation is in billions of dollars so 10b would be 10.0.
-    Note: if the user asks for a rate, return it as a decimal. For example, 0.1 would be 10%.
+Format decimal numbers using ROUND() with 2 decimal places, e.g.:
+  ROUND(column_name, 2) or ROUND(calculation, 2)
 
-    If the user asks for 'over time' data, return by year.
+For time-based analyses, group by YEAR(aluno_data_nascimento) or by series as needed.
 
-    When searching for UK or USA, write out United Kingdom or United States respectively.
-
-    EVERY QUERY SHOULD RETURN QUANTITATIVE DATA THAT CAN BE PLOTTED ON A CHART! There should always be at least two columns. If the user asks for a single column, return the column and the count of the column. If the user asks for a rate, return the rate as a decimal. For example, 0.1 would be 10%.
-    `,
+Use descriptive aliases in Brazilian Portuguese (pt-BR) for result columns to support chart labels. Examples:
+- COUNT(*) as "quantidade_total"
+- ROUND(AVG(age), 2) as "media_idade"
+- raca as "etnia"
+- aluno_genero as "genero"
+`,
       prompt: `Generate the query necessary to retrieve the data the user wants: ${input}`,
       schema: z.object({
         query: z.string(),
@@ -86,7 +85,7 @@ export const runGenerateSQLQuery = async (query: string) => {
   try {
     data = await sql.query(query);
   } catch (e: any) {
-    if (e.message.includes('relation "unicorns" does not exist')) {
+    if (e.message.includes('relation "alunos" does not exist')) {
       console.log(
         "Table does not exist, creating and seeding it with dummy data now...",
       );
@@ -108,22 +107,30 @@ export const explainQuery = async (input: string, sqlQuery: string) => {
       schema: z.object({
         explanations: explanationsSchema,
       }),
-      system: `You are a SQL (postgres) expert. Your job is to explain to the user write a SQL query you wrote to retrieve the data they asked for. The table schema is as follows:
-    unicorns (
-      id SERIAL PRIMARY KEY,
-      company VARCHAR(255) NOT NULL UNIQUE,
-      valuation DECIMAL(10, 2) NOT NULL,
-      date_joined DATE,
-      country VARCHAR(255) NOT NULL,
-      city VARCHAR(255) NOT NULL,
-      industry VARCHAR(255) NOT NULL,
-      select_investors TEXT NOT NULL
-    );
+      system: `You are a SQL (PostgreSQL) expert. Your job is to explain to the user the SQL query you wrote to retrieve the data they asked for. The table schema is as follows:
 
-    When you explain you must take a section of the query, and then explain it. Each "section" should be unique. So in a query like: "SELECT * FROM unicorns limit 20", the sections could be "SELECT *", "FROM UNICORNS", "LIMIT 20".
-    If a section doesnt have any explanation, include it, but leave the explanation empty.
+alunos (
+  id SERIAL PRIMARY KEY,
+  aluno_data_nascimento DATE,
+  aluno_genero VARCHAR(255),
+  raca VARCHAR(255),
+  bolsa_familia BOOLEAN,
+  zona_localizacao VARCHAR(255),
+  bairro VARCHAR(255),
+  cidade VARCHAR(255),
+  escola VARCHAR(255),
+  curso VARCHAR(255),
+  serie VARCHAR(255),
+  matricula_id INTEGER NOT NULL UNIQUE
+);
 
-    `,
+When explaining, break the query into logical sections (SELECT, FROM, WHERE, GROUP BY, etc.) and describe the purpose of each. Provide concise explanations in Brazilian Portuguese (pt-BR) suitable for a non-expert.
+
+Example of explanation style:
+- SELECT: Aqui selecionamos os campos que queremos mostrar
+- WHERE: Filtramos os dados para mostrar apenas...
+- GROUP BY: Agrupamos os resultados por...
+`,
       prompt: `Explain the SQL query you generated to retrieve the data the user wanted. Assume the user is not an expert in SQL. Break down the query into steps. Be concise.
 
       User Query:
@@ -144,7 +151,7 @@ export const generateChartConfig = async (
   userQuery: string,
 ) => {
   "use server";
-  const system = `You are a data visualization expert. `;
+  const system = `You are a data visualization expert. Your job is to generate chart configurations that best visualize the data. All labels, titles and descriptions must be in Brazilian Portuguese (pt-BR).`;
 
   try {
     const { object: config } = await generateObject({

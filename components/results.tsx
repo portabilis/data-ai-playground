@@ -57,14 +57,14 @@ export const Results = ({
     <div className="flex-grow flex flex-col">
       <Tabs defaultValue="table" className="w-full flex-grow flex flex-col">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="table">Table</TabsTrigger>
+          <TabsTrigger value="table">Tabela</TabsTrigger>
           <TabsTrigger
             value="charts"
             disabled={
               Object.keys(results[0] || {}).length <= 1 || results.length < 2
             }
           >
-            Chart
+            Gráfico
           </TabsTrigger>
         </TabsList>
         <TabsContent value="table" className="flex-grow">
