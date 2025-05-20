@@ -9,7 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "seed": "tsx lib/seed.ts"
+    "seed": "tsx lib/seed.ts",
+    "create-suggestions": "tsx lib/create-suggestions-table.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.0.8",
